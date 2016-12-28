@@ -1,28 +1,15 @@
 const ProductList = React.createClass({
   getInitialState: function(){
       return {
-          products: [],
-          sortMethod : 'Descending'
+          products: []
       };
   },
   componentDidMount: function(){
-      this.updateState(this.state.sortMethod);
+      this.updateState();
   },
-  updateState: function(sortMethod){
-    if(sortMethod === 'Descending'){
-        const products = Data.sort((a,b) => a.votes > b.votes ? -1 : 1);
-        this.setState({
-            products: products,
-            sortMethod: sortMethod
-        });
-    }else{
-        const products = Data.sort((a,b) => a.votes > b.votes ? 1 : 1);
-        this.setState({
-            products: products,
-            sortMethod: sortMethod
-        });
-    }
-    
+  updateState: function(){
+      const products = Data.sort((a,b) => a.votes > b.votes ? -1 : 1);
+      this.setState({products: products});
   },
   handleProductUpVote: function(productId){
       console.log(productId + " was upvoted");
@@ -31,20 +18,7 @@ const ProductList = React.createClass({
               e1.votes++;
           }
       });
-      this.updateState(this.state.sortMethod);
-  },
-  handleProductDownVote: function(productId){
-      console.log(productId + " was downvoted");
-      Data.forEach(e1 => {
-          if(e1.id === productId){
-              e1.votes--;
-          }
-      });
-      this.updateState(this.state.sortMethod);
-  },
-  toggleSortingMethod: function(){
-     const newMethod = this.state.sortMethod === 'Descending' ? 'Ascending' : 'Descending';
-     this.updateState(newMethod)
+      this.updateState();
   },
   render: function () {
     const products = this.state.products.map((product) =>{
@@ -58,19 +32,13 @@ const ProductList = React.createClass({
                 votes={product.votes}
                 submitter_avatar_url={product.submitter_avatar_url}
                 product_image_url={product.product_image_url}  
-                onUpVote={this.handleProductUpVote}  
-                onDownVote={this.handleProductDownVote}
+                onVote={this.handleProductUpVote}  
             />
         );
     });
     return (
-        <div>
-            <a onClick={this.toggleSortingMethod}>
-                {this.state.sortMethod}
-            </a>
-        <div className='ui items'>
-            {products}
-        </div>
+      <div className='ui items'>
+        {products}
       </div>
     );
   },
@@ -78,10 +46,7 @@ const ProductList = React.createClass({
 
 const Product = React.createClass({
     handleUpVote: function(){
-        this.props.onUpVote(this.props.id);
-    },  
-    handleDownVote: function(){
-        this.props.onDownVote(this.props.id);
+        this.props.onVote(this.props.id);
     },
     render: function(){
         return (
@@ -92,15 +57,12 @@ const Product = React.createClass({
                 <div className='middle aligned content'>
                 <div className='ui grid'>
                     <div className='three wide column'>
-                        <div className='ui basic center aligned segment'>
-                            <a onClick={this.handleUpVote}>
-                                <i className='large caret up icon'></i>
-                            </a>
-                            <p><b>{this.props.votes}</b></p>
-                            <a onClick={this.handleDownVote}>
-                                <i className="large caret down icon"></i>
-                            </a>
-                        </div>
+                    <div className='ui basic center aligned segment'>
+                        <a onClick={this.handleUpVote}>
+                        <i className='large caret up icon'></i>
+                        </a>
+                        <p><b>{this.props.votes}</b></p>
+                    </div>
                     </div>
                     <div className='twelve wide column'>
                     <div className='header'>
@@ -129,8 +91,4 @@ const Product = React.createClass({
     }
 });
 
-
-ReactDOM.render(
-    <ProductList />,
-    document.getElementById('content')
-);
+export {ProductList};
